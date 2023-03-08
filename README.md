@@ -14,7 +14,7 @@
 
 # <img src='AboutMe.png' height=65/>  About Me:
 
-- Hello🤍, my name is <a href="https://www.linkedin.com/in/syed-hassan-ul-haq-851446247/target="blank">Syed Hassan ul-haq,👨‍💻</a> and I'm a student at UIT studying Computer Science. Python🐍 is my favourite programming language, and I love solving issues. One of the areas where I gained the most knowledge was GitHub. Aim to contribute to the developer community.
+- Hello🤍, my name is <a href="https://www.linkedin.com/in/syed-hassan-ul-haq-851446247/"target=blank"> Syed Hassan ul-haq,👨‍💻</a> and I'm a student at UIT studying Computer Science. Python🐍 is my favourite programming language, and I love solving issues. One of the areas where I gained the most knowledge was GitHub. Aim to contribute to the developer community.
 ------
 <br>🌱 I’m currently learning Scala Functional Programming<br>💬 Ask me about Python, RV32I & Chisel, Scala, Github and Memes<br>👨🏼‍💻 Tech Geek, always ready to learn new Technologies/Frameworks/Languages.<br>
 
