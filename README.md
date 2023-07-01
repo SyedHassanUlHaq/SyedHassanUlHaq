@@ -22,12 +22,13 @@
 ## <img src='socials.png' height=40/> Socials:
 <div>
  <a href="https://www.linkedin.com/in/syed-hassan-ul-haq-851446247" ><img align="left" alt="LinkedIn" height="30px" width="100px" src="https://img.shields.io/badge/Linkedin-0A66C2?style=for-the-badge&logo=Linkedin&logoColor=white" /></a>
-<a href="ulhaqhassan1@gmail.com"><img align="left" alt="Maira gmail" height="30px" width="100px" src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=Gmail&logoColor=white" /></a>
-<a href="https://twitter.com/hassanu63619531" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/twitter.svg" alt="SyedHassanUlHaq" height="30" width="40" /></a></div>
+<a href="ulhaqhassan1@gmail.com"><img align="left" alt="hassan gmail" height="30px" width="100px" src="https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=Gmail&logoColor=white" /></a>
+<a href="https://twitter.com/hassanu63619531" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/twitter.svg" alt="SyedHassanUlHaq" height="30" width="40" /></a>
+<a href="https://www.reddit.com/user/Few-Employment-1462" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/reddit.svg" alt="SyedHassanUlHaq" height="30" width="40" /></a></div>
 
 ## <img src='techstack.png' height=40/> Tech Stack:
 <div align='center'>
-<img src="https://skillicons.dev/icons?i=git,css,html,bootstrap,c,java,py,django,scala" />
+<img src="https://skillicons.dev/icons?i=css,html,bootstrap,py,django,js,java,c,c#scala,git" />
 </div>
 
 
