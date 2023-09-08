@@ -35,7 +35,7 @@
 
 |Stats <img src='stats.jpeg' height=20/>|Streak <img src='streak.png' height=20/>|Languages <img src='streak.png' height=20/>
 |---|---|---|
-|[![](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=SyedHassanUlHaq&theme=cobalt)](https://github.com/SyedHassanUlHaq/)|[![GitHub Streak](https://streak-stats.demolab.com?user=SyedHassanUlHaq&hide_border=true)](https://github.com/SyedHassanUlHaq/)|[![](http://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=SyedHassanUlHaq&theme=cobalt)|
+|[![](http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=SyedHassanUlHaq&theme=cobalt)](https://github.com/SyedHassanUlHaq/)|[![GitHub Streak](https://streak-stats.demolab.com?user=SyedHassanUlHaq&theme=highcontrast)](https://git.io/streak-stats)|[![](http://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=SyedHassanUlHaq&theme=cobalt)|
 
 
 ---
