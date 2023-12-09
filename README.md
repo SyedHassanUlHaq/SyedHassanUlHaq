@@ -8,6 +8,7 @@
    <img src="https://komarev.com/ghpvc/?username=SyedHassanUlHaq" align="center"/> 
  </p></div>
  
+[![An image of @syedhassanulhaq's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/syedhassanulhaq)](https://holopin.io/@syedhassanulhaq)
 
 <a href='giphy.gif'>
 <img align='right' src='giphy.gif' widht=100 height=200></a>
@@ -40,10 +41,10 @@
 
 ---
 
+
 [![Ashutosh's github activity graph](https://github-readme-activity-graph.vercel.app/graph?username=SyedHassanUlHaq&bg_color=443c40&color=000000&line=ffffff&point=050505&area=true&hide_border=true)](https://github.com/ashutosh00710/github-readme-activity-graph)
 <div align='center'>
 <img src='https://quotes-github-readme.vercel.app/api?type=horizontal&theme=gruvbox' width=75%/></div>
-
 
 
 ## 🏆 GitHub Trophies
