@@ -29,7 +29,7 @@
 
 ## <img src='techstack.png' height=40/> Tech Stack:
 <div align='center'>
-<img src="https://skillicons.dev/icons?i=css,html,bootstrap,py,django,mysql,postgresql,js,java,c,scala,go,git" />
+<img src="https://skillicons.dev/icons?i=css,html,bootstrap,py,flask,django,mysql,postgresql,js,java,c,scala,go,git" />
 </div>
 
 
