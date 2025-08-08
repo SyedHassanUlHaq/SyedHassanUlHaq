@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install deps (none required) & run updater
+      - name: Run updater (no deps required)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}    # optional
