@@ -127,9 +127,10 @@ ${wakatime ? `## ⏳ Coding Activity (last 7 days)\n- Total time: ${wakatime.hou
     const wakatime = await getWakatimeSummary();
 
     const nowWorking = (() => {
-      // Choose the repo with latest commit or fallback
-      if (latestCommit && latestCommit.message) return latestCommit.message;
-      return "Exploring new ideas — cryptography, HDL, AI/ML";
+      if (latestCommit && latestCommit.message) {
+        return `${repoName} — ${latestCommit.message}`;
+      }
+      return repoName || "Exploring new ideas — cryptography, HDL, AI/ML";
     })();
 
     const generatedSection = generateReadme({ greeting, nowWorking, latestCommit, openPRs, wakatime });
