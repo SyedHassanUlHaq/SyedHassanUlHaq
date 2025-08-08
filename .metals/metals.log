@@ -8,3 +8,52 @@ SLF4J: See https://www.slf4j.org/codes.html#ignoredBindings for an explanation.
 2023.03.15 23:53:25 INFO  time: initialize in 1.14s
 2023.03.15 23:53:28 WARN  Build server is not auto-connectable.
 2023.03.15 23:53:28 WARN  no build tool detected in workspace '/home/hassan/SyedHassanUlHaq'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2025.08.08 19:40:34 INFO  Started: Metals version 1.6.1 in folders '/home/syed-hassan-ul-haq/repos/SyedHassanUlHaq' for client Visual Studio Code 1.96.2.[0m
+Downloading https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+Downloaded 64963 bytes
+Downloaded 227989 bytes
+Downloaded 457365 bytes
+Downloaded 744319 bytes
+Downloaded 883349 bytes
+Downloaded 981653 bytes
+Downloaded 1096341 bytes
+Downloaded 1178261 bytes
+Downloaded 1276565 bytes
+Downloaded 1342101 bytes
+Downloaded 1407637 bytes
+Downloaded 1440405 bytes
+Downloaded 1522325 bytes
+Downloaded 1571477 bytes
+Downloaded 1604245 bytes
+Downloaded 1637013 bytes
+Downloaded 1669781 bytes
+Downloaded 1718933 bytes
+Downloaded 1735317 bytes
+Downloaded 1768085 bytes
+Downloaded 1800853 bytes
+Downloaded 1850005 bytes
+Downloaded 1882773 bytes
+Downloaded 1915541 bytes
+Downloaded 1931925 bytes
+Downloaded 1948309 bytes
+Downloaded 1981077 bytes
+Downloaded 1997461 bytes
+Downloaded 2013845 bytes
+Downloaded 2046613 bytes
+Downloaded 2079381 bytes
+Downloaded 2112149 bytes
+Downloaded 2144917 bytes
+Downloaded 2177685 bytes
+Downloaded 2194069 bytes
+Downloaded 2210453 bytes
+Downloaded 2243221 bytes
+Downloaded 2308757 bytes
+Downloaded 2390677 bytes
+Downloaded 2472597 bytes
+Downloaded 2521749 bytes
+2025.08.08 19:41:38 INFO  Upgraded H2 database.[0m
+2025.08.08 19:41:39 WARN  no build tool detected in workspace '/home/syed-hassan-ul-haq/repos/SyedHassanUlHaq'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. [0m
+2025.08.08 19:41:40 WARN  Build server is not auto-connectable.[0m
+2025.08.08 19:41:54 INFO  Shutting down server[0m
+2025.08.08 19:41:54 INFO  shutting down Metals[0m
+2025.08.08 19:41:54 INFO  Exiting server[0m
