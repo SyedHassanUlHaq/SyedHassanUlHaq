@@ -1,160 +1,93 @@
-/**
- * scripts/update-readme.js
- *
- * Minimal script to:
- *  - fetch latest commit message for this repo
- *  - count open PRs
- *  - optionally fetch WakaTime last 7 days summary if WAKATIME_API_KEY provided
- *  - compose README content and overwrite README.md
- *
- * No extra npm packages required (node 18+ has global fetch).
- */
-
-import { execSync } from "child_process";
 import fs from "fs/promises";
+import fetch from "node-fetch";
+import { DateTime } from "luxon";
+import { formatDistanceToNow } from "date-fns";
 
-const repo = process.env.GITHUB_REPOSITORY; // e.g. "username/reponame"
-if (!repo) {
-  console.error("GITHUB_REPOSITORY is not set. Are you running inside GitHub Actions?");
-  process.exit(1);
+async function fetchLatestCommit(username, repo) {
+  const res = await fetch(`https://api.github.com/repos/${username}/${repo}/commits`);
+  const data = await res.json();
+  return {
+    message: data[0]?.commit?.message || "No commits",
+    date: data[0]?.commit?.author?.date || null
+  };
 }
-const [owner, repoName] = repo.split("/");
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-if (!GITHUB_TOKEN) {
-  console.error("GITHUB_TOKEN is required (use the automatic secret in Actions).");
-  process.exit(1);
+async function fetchOpenPRs(username) {
+  const res = await fetch(`https://api.github.com/search/issues?q=author:${username}+type:pr+is:open`);
+  const data = await res.json();
+  return data.total_count || 0;
 }
 
-async function ghApi(path, params = {}) {
-  const url = `https://api.github.com${path}`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `token ${GITHUB_TOKEN}`,
-      "User-Agent": "github-actions-autoreadme",
-      Accept: "application/vnd.github.v3+json",
-    },
+async function fetchWakatimeStats() {
+  const wakatimeUsername = process.env.WAKATIME_USERNAME;
+  const wakatimeApiKey = process.env.WAKATIME_API_KEY;
+  if (!wakatimeUsername || !wakatimeApiKey) return "No data";
+
+  const res = await fetch(
+    `https://wakatime.com/api/v1/users/${wakatimeUsername}/stats/last_7_days?api_key=${wakatimeApiKey}`
+  );
+  const data = await res.json();
+  return data?.data?.human_readable_total || "No data";
+}
+
+function generateSection({ greeting, nowWorking, latestCommit, openPRs, wakatime }) {
+  return `
+${greeting}
+
+- 🔭 Currently working on **${nowWorking}**
+- 📝 Latest commit: *${latestCommit.message}* (${latestCommit.date ? formatDistanceToNow(new Date(latestCommit.date)) + " ago" : "unknown"})
+- 📬 Open pull requests: **${openPRs}**
+- ⏱️ WakaTime (last 7 days): **${wakatime}**
+`.trim();
+}
+
+async function main() {
+  const username = "syed-hassan-ux"; // change if needed
+  const repoName = username; // for profile repo, usually same as username
+
+  const greeting = `### Hey there! 👋 — ${DateTime.now().toLocaleString(DateTime.DATETIME_MED)}`;
+  const nowWorking = "Multiple AI & automation projects 🚀";
+
+  const [latestCommit, openPRs, wakatime] = await Promise.all([
+    fetchLatestCommit(username, repoName),
+    fetchOpenPRs(username),
+    fetchWakatimeStats()
+  ]);
+
+  const generatedSection = generateSection({
+    greeting,
+    nowWorking,
+    latestCommit,
+    openPRs,
+    wakatime
   });
-  if (!res.ok) {
-    const txt = await res.text(); console.error("GH API error", res.status, txt); throw new Error("GH API failed");
-  }
-  return res.json();
-}
 
-function niceTimeGreeting() {
-  // Use PKT (Asia/Karachi) offset +5 from UTC. Adjustable.
-  const now = new Date();
-  // compute PKT time:
-  const pktOffset = 5 * 60; // minutes
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const pkt = new Date(utc + pktOffset * 60000);
-  const hour = pkt.getHours();
-  if (hour >= 5 && hour < 12) return "Good morning";
-  if (hour >= 12 && hour < 17) return "Good afternoon";
-  if (hour >= 17 && hour < 22) return "Good evening";
-  return "Hello";
-}
+  const startMarker = "<!-- AUTO-GENERATED: START -->";
+  const endMarker = "<!-- AUTO-GENERATED: END -->";
 
-async function getLatestCommit() {
-  // Get latest commit on default branch
-  const repoInfo = await ghApi(`/repos/${owner}/${repoName}`);
-  const defaultBranch = repoInfo.default_branch;
-  const commits = await ghApi(`/repos/${owner}/${repoName}/commits?sha=${defaultBranch}&per_page=1`);
-  if (Array.isArray(commits) && commits.length > 0) {
-    const c = commits[0];
-    return {
-      message: c.commit.message.split("\n")[0],
-      sha: c.sha.slice(0, 7),
-      date: c.commit.author.date,
-      author: c.commit.author.name,
-      url: c.html_url,
-    };
-  }
-  return null;
-}
-
-async function getOpenPRCount() {
-  // Use the search endpoint for reliable total_count
-  const q = encodeURIComponent(`repo:${owner}/${repoName} type:pr state:open`);
-  const result = await ghApi(`/search/issues?q=${q}`);
-  return result.total_count || 0;
-}
-
-async function getWakatimeSummary() {
-  const key = process.env.WAKATIME_API_KEY;
-  if (!key) return null;
+  // Read existing README
+  let existing;
   try {
-    const res = await fetch(`https://wakatime.com/api/v1/users/current/stats/last_7_days?api_key=${key}`);
-    if (!res.ok) { console.warn("WakaTime fetch failed:", res.status); return null; }
-    const j = await res.json();
-    // j.data.languages is typically an array
-    const hours = j.data.human_readable_total || null;
-    const topLang = (j.data.languages && j.data.languages[0]) ? `${j.data.languages[0].name} (${j.data.languages[0].percent}%)` : null;
-    return { hours, topLang, raw: j.data };
-  } catch (e) {
-    console.warn("WakaTime fetch error", e.message);
-    return null;
+    existing = await fs.readFile("README.md", "utf8");
+  } catch {
+    existing = `${startMarker}\n${endMarker}`;
   }
+
+  const newBlock = `${startMarker}\n${generatedSection}\n${endMarker}`;
+  let updatedReadme;
+
+  if (existing.includes(startMarker) && existing.includes(endMarker)) {
+    const regex = new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`);
+    updatedReadme = existing.replace(regex, newBlock);
+  } else {
+    updatedReadme = `${newBlock}\n\n${existing}`;
+  }
+
+  await fs.writeFile("README.md", updatedReadme, "utf8");
+  console.log("✅ README updated — static content preserved.");
 }
 
-function generateReadme({ greeting, nowWorking, latestCommit, openPRs, wakatime }) {
-  // Keep a stable header to avoid too many churn commits
-  const header = `<!-- AUTO-GENERATED: DO NOT MANUALLY EDIT THIS SECTION -->\n`;
-  const content = `
-${header}
-<p align="center">
-  <strong>${greeting} — welcome to the code lab of <a href="https://github.com/${owner}">${owner}</a> 👋</strong>
-</p>
-
-## ⚡ Now Working On
-- **Project:** ${nowWorking}
-- **Latest commit:** [${latestCommit.message}](${latestCommit.url}) — \`${latestCommit.sha}\` (${new Date(latestCommit.date).toLocaleString()})
-- **Open PRs:** ${openPRs}
-
-${wakatime ? `## ⏳ Coding Activity (last 7 days)\n- Total time: ${wakatime.hours || "N/A"}\n- Top language: ${wakatime.topLang || "N/A"}\n` : ""}
----
-
-*This README section is auto-updated every hour by a GitHub Action. Want voice intro, 3D avatar or AR QR? Add the relevant secrets and I'll expand the engine.*
-`;
-  return content.trim() + "\n";
-}
-
-(async function main() {
-  try {
-    const greeting = niceTimeGreeting();
-    const latestCommit = await getLatestCommit();
-    const openPRs = await getOpenPRCount();
-    const wakatime = await getWakatimeSummary();
-
-    const nowWorking = (() => {
-      if (latestCommit && latestCommit.message) {
-        return `${repoName} — ${latestCommit.message}`;
-      }
-      return repoName || "Exploring new ideas — cryptography, HDL, AI/ML";
-    })();
-
-    const generatedSection = generateReadme({ greeting, nowWorking, latestCommit, openPRs, wakatime });
-
-    // Read existing README if any and replace the autogenerated section if present
-    let existing = "";
-    try { existing = await fs.readFile("README.md", "utf8"); } catch(e){ existing = ""; }
-
-    const autoMarker = "<!-- AUTO-GENERATED: DO NOT MANUALLY EDIT THIS SECTION -->";
-    let newReadme;
-    if (existing.includes(autoMarker)) {
-      // replace from the marker to the end of that section (simple approach: remove previous marker and following lines)
-      const parts = existing.split(autoMarker);
-      const leading = parts[0]; // everything before marker
-      newReadme = leading + generatedSection;
-    } else {
-      // Prepend the generated section to existing README
-      newReadme = generatedSection + "\n\n" + existing;
-    }
-
-    await fs.writeFile("README.md", newReadme, "utf8");
-    console.log("README.md updated.");
-  } catch (err) {
-    console.error("Updater failed:", err);
-    process.exit(1);
-  }
-})();
+main().catch(err => {
+  console.error("❌ Error updating README:", err);
+  process.exit(1);
+});

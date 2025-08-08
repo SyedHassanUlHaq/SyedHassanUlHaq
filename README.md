@@ -1,5 +1,12 @@
- <a href="https://www.linkedin.com/in/syed-hassan-ul-haq-851446247" target="_blank">
+<!-- AUTO-GENERATED-START -->
+<!-- The content below is automatically updated by a GitHub Action -->
+
+<!-- AUTO-GENERATED-END -->
+
+<!-- Your static content below -->
+<a href="https://www.linkedin.com/in/syed-hassan-ul-haq-851446247" target="_blank">
 <p align="center">
+... your entire profile content here ...
 
 <div align='center'>
 <p align="center"> 
