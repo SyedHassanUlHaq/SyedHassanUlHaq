@@ -2,14 +2,14 @@ name: Auto Update README
 
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour
+    - cron: "0 * * * *" # Every hour
   workflow_dispatch: {}
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  update-readme:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,14 +20,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Run updater (no deps required)
+      - name: Run updater
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}    # optional
-        run: |
-          node ./scripts/update-readme.js
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          WAKATIME_USERNAME: ${{ secrets.WAKATIME_USERNAME }}
+        run: node ./scripts/update-readme.js
 
       - name: Commit & push if changed
         run: |
@@ -37,6 +37,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No README changes to commit."
           else
-            git commit -m "chore(readme): auto-update README (now-working / stats)"
+            git commit -m "chore(readme): auto-update README"
             git push
           fi

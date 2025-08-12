@@ -1,10 +1,12 @@
 import fs from "fs/promises";
-import fetch from "node-fetch";
 import { DateTime } from "luxon";
 import { formatDistanceToNow } from "date-fns";
 
+// Native fetch is available in Node 20+, no import needed
+
 async function fetchLatestCommit(username, repo) {
   const res = await fetch(`https://api.github.com/repos/${username}/${repo}/commits`);
+  if (!res.ok) throw new Error(`Failed to fetch commits: ${res.status}`);
   const data = await res.json();
   return {
     message: data[0]?.commit?.message || "No commits",
@@ -14,6 +16,7 @@ async function fetchLatestCommit(username, repo) {
 
 async function fetchOpenPRs(username) {
   const res = await fetch(`https://api.github.com/search/issues?q=author:${username}+type:pr+is:open`);
+  if (!res.ok) throw new Error(`Failed to fetch PRs: ${res.status}`);
   const data = await res.json();
   return data.total_count || 0;
 }
@@ -26,6 +29,7 @@ async function fetchWakatimeStats() {
   const res = await fetch(
     `https://wakatime.com/api/v1/users/${wakatimeUsername}/stats/last_7_days?api_key=${wakatimeApiKey}`
   );
+  if (!res.ok) throw new Error(`Failed to fetch WakaTime stats: ${res.status}`);
   const data = await res.json();
   return data?.data?.human_readable_total || "No data";
 }
@@ -42,7 +46,7 @@ ${greeting}
 }
 
 async function main() {
-  const username = "syed-hassan-ux"; // change if needed
+  const username = "SyedHassanUlHaq";
   const repoName = username; // for profile repo, usually same as username
 
   const greeting = `### Hey there! 👋 — ${DateTime.now().toLocaleString(DateTime.DATETIME_MED)}`;
@@ -65,7 +69,6 @@ async function main() {
   const startMarker = "<!-- AUTO-GENERATED: START -->";
   const endMarker = "<!-- AUTO-GENERATED: END -->";
 
-  // Read existing README
   let existing;
   try {
     existing = await fs.readFile("README.md", "utf8");
