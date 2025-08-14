@@ -9,9 +9,18 @@ async function fetchLatestCommit(username, repo) {
   const res = await fetch(`https://api.github.com/repos/${username}/${repo}/commits`);
   if (!res.ok) throw new Error(`Failed to fetch commits: ${res.status}`);
   const data = await res.json();
+
+  const nonBot = data.find(c => {
+    const msg = c?.commit?.message || "";
+    const authorName = c?.commit?.author?.name || "";
+    const committerName = c?.commit?.committer?.name || "";
+    const isBot = authorName.includes("[bot]") || committerName.includes("[bot]") || msg.startsWith("chore(readme): auto-update");
+    return !isBot;
+  }) || data[0];
+
   return {
-    message: data[0]?.commit?.message || "No commits",
-    date: data[0]?.commit?.author?.date || null
+    message: nonBot?.commit?.message || "No commits",
+    date: nonBot?.commit?.author?.date || null
   };
 }
 
@@ -54,6 +63,39 @@ async function fetchRecentEvents(username) {
   return { pushes, prsOpened, issuesOpened, stars };
 }
 
+async function fetchContributionCounts(username) {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) return null;
+  const query = `
+    query($login: String!) {
+      user(login: $login) {
+        contributionsCollection {
+          contributionCalendar { totalContributions }
+          totalCommitContributions
+          restrictedContributionsCount
+        }
+      }
+    }
+  `;
+  const res = await fetch("https://api.github.com/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `bearer ${token}`
+    },
+    body: JSON.stringify({ query, variables: { login: username } })
+  });
+  if (!res.ok) return null;
+  const body = await res.json();
+  const cc = body?.data?.user?.contributionsCollection;
+  if (!cc) return null;
+  return {
+    totalContributions: cc.contributionCalendar?.totalContributions || 0,
+    totalCommitContributions: cc.totalCommitContributions || 0,
+    restrictedContributionsCount: cc.restrictedContributionsCount || 0
+  };
+}
+
 async function generateAIDevlog({ username, latestCommit, openPRs, wakatime, recent }) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
@@ -82,7 +124,10 @@ async function generateAIDevlog({ username, latestCommit, openPRs, wakatime, rec
   }
 }
 
-function generateSection({ greeting, nowWorking, latestCommit, openPRs, wakatime, aiDevlog }) {
+function generateSection({ greeting, nowWorking, latestCommit, openPRs, wakatime, aiDevlog, contrib }) {
+  const contribLine = contrib
+    ? `\n- 🔢 Last 365 days contributions: **${contrib.totalContributions}** (commits: ${contrib.totalCommitContributions}, restricted: ${contrib.restrictedContributionsCount})`
+    : "";
   return `
 ${greeting}
 
@@ -90,7 +135,7 @@ ${aiDevlog ? `#### AI Daily Devlog\n\n${aiDevlog}\n` : ""}
 - 🔭 Currently working on **${nowWorking}**
 - 📝 Latest commit: *${latestCommit.message}* (${latestCommit.date ? formatDistanceToNow(new Date(latestCommit.date)) + " ago" : "unknown"})
 - 📬 Open pull requests: **${openPRs}**
-- ⏱️ WakaTime (last 7 days): **${wakatime}**
+- ⏱️ WakaTime (last 7 days): **${wakatime}**${contribLine}
 `.trim();
 }
 
@@ -98,14 +143,16 @@ async function main() {
   const username = "SyedHassanUlHaq";
   const repoName = username; // for profile repo, usually same as username
 
-  const greeting = `### Hey there! 👋 — ${DateTime.now().toLocaleString(DateTime.DATETIME_MED)}`;
+  // Make greeting static to avoid hourly content churn
+  const greeting = `### Hey there! 👋`;
   const nowWorking = "Multiple AI & automation projects 🚀";
 
-  const [latestCommit, openPRs, wakatime, recent] = await Promise.all([
+  const [latestCommit, openPRs, wakatime, recent, contrib] = await Promise.all([
     fetchLatestCommit(username, repoName),
     fetchOpenPRs(username),
     fetchWakatimeStats(),
-    fetchRecentEvents(username)
+    fetchRecentEvents(username),
+    fetchContributionCounts(username)
   ]);
 
   const aiDevlog = await generateAIDevlog({ username, latestCommit, openPRs, wakatime, recent });
@@ -116,7 +163,8 @@ async function main() {
     latestCommit,
     openPRs,
     wakatime,
-    aiDevlog
+    aiDevlog,
+    contrib
   });
 
   const startMarker = "<!-- AUTO-GENERATED-START -->";
@@ -130,8 +178,15 @@ async function main() {
   }
 
   const newBlock = `${startMarker}\n${generatedSection}\n${endMarker}`;
-  let updatedReadme;
 
+  // If existing block content is identical, skip writing to avoid noise commits
+  const match = existing.match(new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`));
+  if (match && match[0] === newBlock) {
+    console.log("ℹ️ No README changes — skipping write.");
+    return;
+  }
+
+  let updatedReadme;
   if (existing.includes(startMarker) && existing.includes(endMarker)) {
     const regex = new RegExp(`${startMarker}[\\s\\S]*?${endMarker}`);
     updatedReadme = existing.replace(regex, newBlock);
