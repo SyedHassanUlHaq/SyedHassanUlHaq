@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import { DateTime } from "luxon";
 import { formatDistanceToNow } from "date-fns";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Native fetch is available in Node 20+, no import needed
 
@@ -34,10 +35,58 @@ async function fetchWakatimeStats() {
   return data?.data?.human_readable_total || "No data";
 }
 
-function generateSection({ greeting, nowWorking, latestCommit, openPRs, wakatime }) {
+async function fetchRecentEvents(username) {
+  const res = await fetch(`https://api.github.com/users/${username}/events/public`);
+  if (!res.ok) return { pushes: 0, prsOpened: 0, issuesOpened: 0, stars: 0 };
+  const events = await res.json();
+
+  let pushes = 0;
+  let prsOpened = 0;
+  let issuesOpened = 0;
+  let stars = 0;
+
+  for (const ev of events) {
+    if (ev.type === "PushEvent") pushes += ev.payload?.size || 0;
+    if (ev.type === "PullRequestEvent" && ev.payload?.action === "opened") prsOpened += 1;
+    if (ev.type === "IssuesEvent" && ev.payload?.action === "opened") issuesOpened += 1;
+    if (ev.type === "WatchEvent") stars += 1;
+  }
+  return { pushes, prsOpened, issuesOpened, stars };
+}
+
+async function generateAIDevlog({ username, latestCommit, openPRs, wakatime, recent }) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const prompt = [
+    "You are generating a concise, friendly daily devlog for a GitHub profile README.",
+    `User: ${username}`,
+    `Latest commit message: ${latestCommit.message}`,
+    `Latest commit time: ${latestCommit.date ? formatDistanceToNow(new Date(latestCommit.date)) + " ago" : "unknown"}`,
+    `Open PRs: ${openPRs}`,
+    `WakaTime (last 7 days): ${wakatime}`,
+    `Recent activity — pushes: ${recent.pushes}, PRs opened: ${recent.prsOpened}, issues opened: ${recent.issuesOpened}, stars: ${recent.stars}`,
+    "Write exactly 3 bullet points in markdown, each 1 sentence, energetic but professional, no emojis except rocket. Keep under 300 chars total."
+  ].join("\n");
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response?.text?.() || result.response?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    return text?.trim() || null;
+  } catch (err) {
+    console.error("Gemini summarization failed:", err);
+    return null;
+  }
+}
+
+function generateSection({ greeting, nowWorking, latestCommit, openPRs, wakatime, aiDevlog }) {
   return `
 ${greeting}
 
+${aiDevlog ? `#### AI Daily Devlog\n\n${aiDevlog}\n` : ""}
 - 🔭 Currently working on **${nowWorking}**
 - 📝 Latest commit: *${latestCommit.message}* (${latestCommit.date ? formatDistanceToNow(new Date(latestCommit.date)) + " ago" : "unknown"})
 - 📬 Open pull requests: **${openPRs}**
@@ -52,22 +101,26 @@ async function main() {
   const greeting = `### Hey there! 👋 — ${DateTime.now().toLocaleString(DateTime.DATETIME_MED)}`;
   const nowWorking = "Multiple AI & automation projects 🚀";
 
-  const [latestCommit, openPRs, wakatime] = await Promise.all([
+  const [latestCommit, openPRs, wakatime, recent] = await Promise.all([
     fetchLatestCommit(username, repoName),
     fetchOpenPRs(username),
-    fetchWakatimeStats()
+    fetchWakatimeStats(),
+    fetchRecentEvents(username)
   ]);
+
+  const aiDevlog = await generateAIDevlog({ username, latestCommit, openPRs, wakatime, recent });
 
   const generatedSection = generateSection({
     greeting,
     nowWorking,
     latestCommit,
     openPRs,
-    wakatime
+    wakatime,
+    aiDevlog
   });
 
-  const startMarker = "<!-- AUTO-GENERATED: START -->";
-  const endMarker = "<!-- AUTO-GENERATED: END -->";
+  const startMarker = "<!-- AUTO-GENERATED-START -->";
+  const endMarker = "<!-- AUTO-GENERATED-END -->";
 
   let existing;
   try {

@@ -23,23 +23,30 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install luxon date-fns node-fetch
+        run: npm install luxon date-fns node-fetch @google/generative-ai
 
       - name: Run updater
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
           WAKATIME_USERNAME: ${{ secrets.WAKATIME_USERNAME }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node ./scripts/update-readme.js
+
+      - name: Generate skill radar
+        env:
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          WAKATIME_USERNAME: ${{ secrets.WAKATIME_USERNAME }}
+        run: node ./scripts/generate-skill-radar.js
 
       - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md || true
+          git add README.md skill-radar.svg || true
           if git diff --cached --quiet; then
             echo "No README changes to commit."
           else
-            git commit -m "chore(readme): auto-update README"
+            git commit -m "chore(readme): auto-update README + radar"
             git push
           fi

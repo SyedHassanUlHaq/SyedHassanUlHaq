@@ -57,4 +57,9 @@
 ## 🏆 GitHub Trophies
 <img src='https://github-profile-trophy.vercel.app/?username=SyedHassanUlHaq&bg_color=19000e&text_color=51087E&title_color=fffffa&point=fffffa&theme=radical&no-frame=true&no-bg=true&margin-w=4' width=75%/>
 
+## Skill Radar (Last 90 Days)
+<div align='center'>
+  <img src='./skill-radar.svg' width='75%'/>
+</div>
+
 ---
