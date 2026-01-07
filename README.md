@@ -1,32 +1,3 @@
-<!-- AUTO-GENERATED: START -->
-### Hey there! 👋 — Aug 14, 2025, 10:12 AM
-
-- 🔭 Currently working on **Multiple AI & automation projects 🚀**
-- 📝 Latest commit: *chore(readme): auto-update README* (about 1 hour ago)
-- 📬 Open pull requests: **1**
-- ⏱️ WakaTime (last 7 days): **No data**
-<!-- AUTO-GENERATED: END -->
-
-<!-- AUTO-GENERATED-START -->
-### Hey there! 👋 — Aug 14, 2025, 11:10 AM
-
-#### AI Daily Devlog
-
-* Merged main branch updates 🚀!
-* One pull request currently in review.
-* Busy week pushing 117 commits to various projects.
-
-- 🔭 Currently working on **Multiple AI & automation projects 🚀**
-- 📝 Latest commit: *Merge branch 'main' of github.com:SyedHassanUlHaq/SyedHassanUlHaq* (37 minutes ago)
-- 📬 Open pull requests: **1**
-- ⏱️ WakaTime (last 7 days): **0 secs**
-<!-- AUTO-GENERATED-END -->
-
-<!-- Your static content below -->
-<a href="https://www.linkedin.com/in/syed-hassan-ul-haq-851446247" target="_blank">
-<p align="center">
-... your entire profile content here ...
-
 <div align='center'>
 <p align="center"> 
    Visitor count:
@@ -75,15 +46,5 @@
 
 ## 🏆 GitHub Trophies
 <img src='https://github-profile-trophy.vercel.app/?username=SyedHassanUlHaq&bg_color=19000e&text_color=51087E&title_color=fffffa&point=fffffa&theme=radical&no-frame=true&no-bg=true&margin-w=4' width=75%/>
-
-## Skill Radar (Last 90 Days)
-<div align='center'>
-  <img src='./skill-radar.svg' width='75%'/>
-</div>
-
-## Contribution Globe
-<div align='center'>
-  <img src='./contrib-globe.svg' width='75%'/>
-</div>
 
 ---
