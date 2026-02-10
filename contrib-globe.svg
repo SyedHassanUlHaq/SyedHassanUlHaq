@@ -381,6 +381,7 @@
     <circle cx='372.9' cy='96.6' r='1.20' fill='rgba(0,0,0,0)' filter='url(#glow)' fill-opacity='0.00'/>
     <circle cx='360.0' cy='395.4' r='1.20' fill='rgba(0,0,0,0)' filter='url(#glow)' fill-opacity='0.00'/>
     <circle cx='360.0' cy='354.9' r='1.20' fill='rgba(0,0,0,0)' filter='url(#glow)' fill-opacity='0.00'/>
+    <circle cx='360.0' cy='303.4' r='1.20' fill='rgba(0,0,0,0)' filter='url(#glow)' fill-opacity='0.00'/>
     <animateTransform attributeName='transform' attributeType='XML' type='rotate' from='0 360 246' to='360 360 246' dur='24s' repeatCount='indefinite'/>
   </g>
   <text x='50%' y='44' text-anchor='middle' font-family='Inter, ui-sans-serif, system-ui' font-size='20' fill='#fffffa'>Contribution Globe (Last 52 Weeks)</text>
